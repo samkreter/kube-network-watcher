@@ -18,7 +18,6 @@ var agentCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(agentCmd)
 
-	agentCmd.Flags().StringVar(&vars, "vars", "", "the vars")
 }
 
 func startHelper(cmd *cobra.Command, args []string) {
