@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package controller.v1;
+
+option go_package = "github.com/samkreter/kube-network-watcher/proto/agent/v1";
+
+service AgentService {
+    rpc StartNetworkWatch (StartNetworkWatchRequest) returns (StartNetworkWatchResponse);
+    rpc StopNetworkWatch (StopNetworkWatchRequest) returns (StopNetworkWatchrResponse);
+}
+
+message StartNetworkWatchRequest {}
+
+message StopNetworkWatchRequest {}
+
+message StartNetworkWatchResponse {}
+
+message StopNetworkWatchrResponse {}
