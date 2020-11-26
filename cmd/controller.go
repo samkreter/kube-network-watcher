@@ -1,16 +1,6 @@
 package main
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"net"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
-	"time"
-
 	"github.com/spf13/cobra"
 )
 
@@ -30,8 +20,7 @@ var controllerCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(controllerCmd)
 
-	controllerCmd.Flags().StringVar(&tenantID, "tenant-id", "", "Tenant ID")
-	controllerCmd.Flags().StringVar(&clientID, "aad-client-id", "", "Service Principal ID")
+
 }
 
 func startHelper(cmd *cobra.Command, args []string) {

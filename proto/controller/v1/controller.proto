@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package controller.v1;
+
+option go_package = "github.com/samkreter/kube-network-watcher/proto/controller/v1";
+
+service ControllerService {
+    rpc Register (RegisterRequest) returns (RegisterResponse);
+    rpc DeRegister (DeRegisterRequest) returns (DeRegisterResponse);
+}
+
+message RegisterRequest {
+    string pod_name = 1;
+    string deployment_name = 2;
+    string namespace = 3;
+}
+
+message DeRegisterRequest {
+    string pod_name = 1;
+    string deployment_name = 2;
+    string namespace = 3;
+}
+
+message RegisterResponse {}
+
+message DeRegisterResponse {}
