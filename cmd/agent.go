@@ -42,8 +42,11 @@ func agentRun(cmd *cobra.Command, args []string) {
 	agentService.RegisterAgentServiceServer(grpcServer, svr)
 	reflection.Register(grpcServer)
 
-	if err := grpcServer.Serve(listen); err != nil {
-		log.Fatal(err)
-	}
+	errorPipeline := make(chan error)
+	go func(){
+		log.Println("starting grpc agent server")
+		errorPipeline <- grpcServer.Serve(listen)
+	}()
+
 }
 
