@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -27,7 +27,7 @@ var controllerCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(controllerCmd)
-	agentCmd.Flags().StringVar(&controllerGRPCAddr, "controllerGRPCAddr", ":5656", "thee addr for the controller to server its grpc server")
+	controllerCmd.Flags().StringVar(&controllerGRPCAddr, "controllerGRPCAddr", ":5656", "thee addr for the controller to server its grpc server")
 }
 
 func controllerRun(cmd *cobra.Command, args []string) {
@@ -42,7 +42,13 @@ func controllerRun(cmd *cobra.Command, args []string) {
 	controllerService.RegisterControllerServiceServer(grpcServer, svr)
 	reflection.Register(grpcServer)
 
-	if err := grpcServer.Serve(listen); err != nil {
+	errorPipeline := make(chan error)
+	go func(){
+		log.Println("starting grpc controller server")
+		errorPipeline <- grpcServer.Serve(listen)
+	}()
+
+	if err := <-errorPipeline; err != nil {
 		log.Fatal(err)
 	}
 }

@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	defaultdDevice       string = "eth0"
+	defaultdDevice     = "eth0"
 	snapshot_len int32  = 1024
-	promiscuous  bool   = false
+	promiscuous    = false
 	err          error
-	timeout      time.Duration = 30 * time.Second
+	timeout      = 30 * time.Second
 	handle       *pcap.Handle
 )
 
-func main() {
+func StartPacketDump() {
 	device, err := getDefaultNetworkInterface()
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +30,6 @@ func main() {
 	}
 	defer handle.Close()
 
-	// Use the handle as a packet source to process all packets
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
 		// Process packet here

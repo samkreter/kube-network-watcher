@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -8,9 +8,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-
-	agentService "github.com/samkreter/kube-network-watcher/proto/agent/v1"
 	"github.com/samkreter/kube-network-watcher/agent/apiserver"
+	agentService "github.com/samkreter/kube-network-watcher/proto/agent/v1"
 )
 
 
@@ -20,8 +19,8 @@ var (
 
 var agentCmd = &cobra.Command{
 	Use:   "agent",
-	Short: "A brief description of your command",
-	Long:  `A longer description of your command`,
+	Short: "The agent to perform the network watchs",
+	Long:  `The agent to perform the network watch`,
 	Run:   agentRun,
 }
 
@@ -48,5 +47,8 @@ func agentRun(cmd *cobra.Command, args []string) {
 		errorPipeline <- grpcServer.Serve(listen)
 	}()
 
+	if err := <-errorPipeline; err != nil {
+		log.Fatal(err)
+	}
 }
 
