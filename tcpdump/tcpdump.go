@@ -1,40 +1,55 @@
-package main
+package tcpdump
 
 import (
 	"fmt"
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
-	"log"
+	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
-	defaultdDevice     = "eth0"
-	snapshot_len int32  = 1024
+	defaultDevice     = "eth0"
+
+	// 65535 for full packet, 1024 for header
+	snapshotLen int32  = 65535
 	promiscuous    = false
-	err          error
-	timeout      = 30 * time.Second
-	handle       *pcap.Handle
+	// Negative timeout always flushes packets
+	timeout      = time.Second * -1
 )
 
-func StartPacketDump() {
+
+// StartPacketDump dumps all packets to the screen
+// TODO: Allow passing customer BPF filters
+func StartPacketDump() error {
 	device, err := getDefaultNetworkInterface()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	handle, err = pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
+	log.Infof("Using network interface: %s", device)
+
+	handle, err := pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer handle.Close()
 
+	// Just look for tcp
+	handle.SetBPFFilter("tcp")
+
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+
+	log.Info("Starting packet dump")
+
 	for packet := range packetSource.Packets() {
-		// Process packet here
 		fmt.Println(packet)
 	}
+
+	return nil
 }
 
 
@@ -50,10 +65,19 @@ func getDefaultNetworkInterface() (string, error) {
 	}
 
     for _, device := range devices {
-    	if strings.EqualFold(device.Name, defaultdDevice){
-			return defaultdDevice, nil
+    	if strings.EqualFold(device.Name, defaultDevice){
+			return defaultDevice, nil
 		}
     }
 
     return devices[0].Name, nil
+}
+
+
+func getetstate() {
+	out, err := exec.Command("netstat", "-tan").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("The date is %s\n", out)
 }

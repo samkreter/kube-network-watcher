@@ -3,6 +3,8 @@ FROM golang:1.13 as builder
 
 WORKDIR /workspace
 
+RUN apt update && apt install -y libpcap-dev
+
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
@@ -14,13 +16,17 @@ RUN go mod download
 COPY ./ ./
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o kube-network-watcher main.go
+RUN GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o kube-network-watcher main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+# gcr.io/distroless/static:nonroot
+FROM debian
 WORKDIR /
+
+RUN apt update && apt install -y libpcap-dev
+
 COPY --from=builder /workspace/kube-network-watcher .
-USER nonroot:nonroot
+#USER nonroot:nonroot
 
 ENTRYPOINT ["/kube-network-watcher"]

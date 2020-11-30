@@ -9,10 +9,19 @@ import (
 	types "github.com/samkreter/kube-network-watcher/proto/agent/v1"
 )
 
-type Server struct {}
 
-func NewServer() *Server {
-	return &Server{}
+type Server struct {
+	PodName string
+	DeployName string
+	Namespace string
+}
+
+func NewServer(podName, deployName, namespace string) *Server {
+	return &Server{
+		PodName: podName,
+		DeployName: deployName,
+		Namespace: namespace,
+	}
 }
 
 func (s *Server) StartNetworkWatch(ctx context.Context, startNetworkWatchRequest *types.StartNetworkWatchRequest) (*types.StartNetworkWatchResponse, error){
